@@ -40,6 +40,8 @@ app.use(cors({
       'http://localhost:5000',
       'http://127.0.0.1:3000',
       'http://127.0.0.1:5000',
+      'https://dairy.u2tech.in',
+      'http://dairy.u2tech.in',
       process.env.FRONTEND_URL
     ].filter(Boolean);
 
@@ -67,6 +69,10 @@ const swaggerOptions = {
       {
         url: 'http://localhost:5000',
         description: 'Development server',
+      },
+      {
+        url: 'https://dairy.u2tech.in',
+        description: 'Production server',
       },
     ],
     components: {
