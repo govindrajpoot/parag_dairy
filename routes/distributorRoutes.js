@@ -217,34 +217,6 @@ router.put('/:id', authenticateToken, (req, res, next) => {
 }, updateDistributor);
 
 /**
- * @swagger
- * /api/distributors/{id}:
- *   delete:
- *     summary: Delete distributor by ID
- *     tags: [Distributors]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *       name: id
- *       required: true
- *       schema:
- *         type: integer
- *       description: Distributor ID
- *     responses:
- *       200:
- *         description: Distributor deleted successfully
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden - insufficient permissions
- *       404:
- *         description: Distributor not found
- *       500:
- *         description: Server error
- */
-
-/**
  * @route   DELETE /api/distributors/:id
  * @desc    Delete distributor by ID
  * @access  Private (Admin or Distributor themselves)
