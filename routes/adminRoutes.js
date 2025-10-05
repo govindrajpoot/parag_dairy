@@ -71,11 +71,11 @@ router.get('/', authenticateToken, authorizeRoles('Admin'), getAdmins);
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *       name: id
- *       required: true
- *       schema:
- *         type: integer
- *       description: Admin ID
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Admin ID
  *     responses:
  *       200:
  *         description: Admin deleted successfully

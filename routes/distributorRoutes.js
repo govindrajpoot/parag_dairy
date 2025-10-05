@@ -86,11 +86,11 @@ router.get('/', authenticateToken, (req, res, next) => {
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *       name: id
- *       required: true
- *       schema:
- *         type: integer
- *       description: Distributor ID
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Distributor ID
  *     responses:
  *       200:
  *         description: Distributor retrieved successfully
@@ -155,11 +155,11 @@ router.get('/:id', authenticateToken, (req, res, next) => {
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *       name: id
- *       required: true
- *       schema:
- *         type: integer
- *       description: Distributor ID
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Distributor ID
  *     requestBody:
  *       required: true
  *       content:
