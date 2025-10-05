@@ -1,4 +1,4 @@
-import User from '../models/User.js';
+import User from '../models/userModel.js';
 
 /**
  * @desc    Get all distributors
@@ -7,17 +7,18 @@ import User from '../models/User.js';
  */
 export const getDistributors = async (req, res) => {
   try {
-    const distributors = await User.find({ role: 'Distributor' })
-      .select('-password')
-      .sort({ createdAt: -1 });
+    const distributors = await User.findDistributors();
+
+    // Remove password from response
+    const safeDistributors = distributors.map(distributor => distributor.toSafeObject());
 
     res.status(200).json({
       status: 200,
       success: true,
       message: 'Distributors retrieved successfully',
       data: {
-        distributors,
-        count: distributors.length
+        distributors: safeDistributors,
+        count: safeDistributors.length
       }
     });
   } catch (error) {

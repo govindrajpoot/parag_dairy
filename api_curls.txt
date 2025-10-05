@@ -1,0 +1,148 @@
+# API Test Commands - Copy and paste into terminal or Postman
+
+# Base URL
+BASE_URL=http://localhost:5000
+
+# 1. Health Check (GET, Public)
+curl -X GET "$BASE_URL/health" \
+  -H "Content-Type: application/json"
+
+# 2. Sign In (POST, Public) - Replace with actual credentials
+curl -X POST "$BASE_URL/api/auth/signin" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "admin@example.com",
+    "password": "admin123"
+  }'
+
+# After signin, copy the token from response and replace TOKEN below
+
+# 3. Sign Up (POST, Private - Admin/Distributor) - Requires token
+curl -X POST "$BASE_URL/api/auth/signup" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer TOKEN" \
+  -d '{
+    "name": "New User",
+    "email": "newuser@example.com",
+    "password": "password123",
+    "role": "Distributor"
+  }'
+
+# 4. Get All Users (GET, Private - Admin) - Requires token
+curl -X GET "$BASE_URL/api/auth/users" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer TOKEN"
+
+# 5. Reset Password (POST, Public)
+curl -X POST "$BASE_URL/api/auth/reset-password" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com"
+  }'
+
+# 6. Get All Distributors (GET, Private - Admin) - Requires token
+curl -X GET "$BASE_URL/api/distributors" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer TOKEN"
+
+# 7. Get Distributor by ID (GET, Private - Admin) - Requires token, replace :id
+curl -X GET "$BASE_URL/api/distributors/123" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer TOKEN"
+
+# 8. Update Distributor (PUT, Private - Admin or self) - Requires token, replace :id
+curl -X PUT "$BASE_URL/api/distributors/123" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer TOKEN" \
+  -d '{
+    "name": "Updated Distributor Name",
+    "email": "updated@example.com"
+  }'
+
+# 9. Delete Distributor (DELETE, Private - Admin or self) - Requires token, replace :id
+curl -X DELETE "$BASE_URL/api/distributors/123" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer TOKEN"
+
+# 10. Get All Admins (GET, Private - Admin) - Requires token
+curl -X GET "$BASE_URL/api/admins" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer TOKEN"
+
+# 11. Delete Admin (DELETE, Private - Admin) - Requires token, replace :id
+curl -X DELETE "$BASE_URL/api/admins/456" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer TOKEN"
+
+# 12. Create Product (POST, Private - Admin) - Requires token
+curl -X POST "$BASE_URL/api/products" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer TOKEN" \
+  -d '{
+    "name": "Milk",
+    "description": "Fresh cow milk",
+    "category": "Dairy"
+  }'
+
+# 13. Get All Products (GET, Private - Admin) - Requires token
+curl -X GET "$BASE_URL/api/products" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer TOKEN"
+
+# 14. Get Product by ID (GET, Private - Admin) - Requires token, replace :id
+curl -X GET "$BASE_URL/api/products/789" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer TOKEN"
+
+# 15. Update Product (PUT, Private - Admin) - Requires token, replace :id
+curl -X PUT "$BASE_URL/api/products/789" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer TOKEN" \
+  -d '{
+    "name": "Updated Milk",
+    "description": "Updated description"
+  }'
+
+# 16. Delete Product (DELETE, Private - Admin) - Requires token, replace :id
+curl -X DELETE "$BASE_URL/api/products/789" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer TOKEN"
+
+# 17. Get Products for Distributor (GET, Private - Distributor) - Requires token (Distributor role)
+curl -X GET "$BASE_URL/api/products/distributor" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer TOKEN"
+
+# 18. Create Product Price (POST, Private - Admin) - Requires token
+curl -X POST "$BASE_URL/api/product-prices" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer TOKEN" \
+  -d '{
+    "productId": "789",
+    "distributorId": "123",
+    "price": 50.00,
+    "unit": "liter"
+  }'
+
+# 19. Get All Product Prices (GET, Private - Admin) - Requires token
+curl -X GET "$BASE_URL/api/product-prices" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer TOKEN"
+
+# 20. Get Product Price by ID (GET, Private - Admin) - Requires token, replace :id
+curl -X GET "$BASE_URL/api/product-prices/101" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer TOKEN"
+
+# 21. Update Product Price (PUT, Private - Admin) - Requires token, replace :id
+curl -X PUT "$BASE_URL/api/product-prices/101" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer TOKEN" \
+  -d '{
+    "price": 60.00
+  }'
+
+# 22. Delete Product Price (DELETE, Private - Admin) - Requires token, replace :id
+curl -X DELETE "$BASE_URL/api/product-prices/101" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer TOKEN"

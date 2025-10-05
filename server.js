@@ -1,28 +1,29 @@
 import app from './app.js';
-import User from './models/User.js';
+import User from './models/userModel.js';
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 
 /**
  * Seed admin user if no admin exists
  */
 const seedAdminUser = async () => {
   try {
-    const adminExists = await User.findOne({ role: 'Admin' });
+    // Check if admin user already exists by email
+    const existingAdmin = await User.findByEmail('admin@paramdairy.com');
 
-    if (!adminExists) {
-      const adminUser = new User({
+    if (!existingAdmin) {
+      await User.create({
         name: 'Super Admin',
         email: 'admin@paramdairy.com',
         password: 'Admin@123', // In production, this should be changed
         role: 'Admin'
       });
-
-      await adminUser.save();
       console.log('✅ Admin user seeded successfully');
       console.log('📧 Email: admin@paramdairy.com');
       console.log('🔑 Password: Admin@123');
       console.log('⚠️  Please change the default password after first login');
+    } else {
+      console.log('ℹ️  Admin user already exists');
     }
   } catch (error) {
     console.error('❌ Error seeding admin user:', error.message);

@@ -1,4 +1,4 @@
-import User from '../models/User.js';
+import User from '../models/userModel.js';
 
 /**
  * @desc    Get all admins
@@ -7,17 +7,21 @@ import User from '../models/User.js';
  */
 export const getAdmins = async (req, res) => {
   try {
-    const admins = await User.find({ role: 'Admin' })
-      .select('-password')
-      .sort({ createdAt: -1 });
+    const admins = await User.findAll();
+
+    // Filter admins and remove password from response
+    const adminUsers = admins
+      .filter(user => user.role === 'Admin')
+      .map(admin => admin.toSafeObject())
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
     res.status(200).json({
       status: 200,
       success: true,
       message: 'Admins retrieved successfully',
       data: {
-        admins,
-        count: admins.length
+        admins: adminUsers,
+        count: adminUsers.length
       }
     });
   } catch (error) {

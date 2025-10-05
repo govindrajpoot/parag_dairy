@@ -1,4 +1,5 @@
-import Product from '../models/Product.js';
+import Product from '../models/ProductModel.js';
+import ProductPrice from '../models/ProductPriceModel.js';
 
 /**
  * @desc    Create a new product
@@ -20,7 +21,7 @@ export const createProduct = async (req, res) => {
     }
 
     // Check if productCode already exists
-    const existingProduct = await Product.findOne({ productCode: productCode.trim() });
+    const existingProduct = await Product.findByProductCode(productCode.trim());
     if (existingProduct) {
       return res.status(400).json({
         status: 400,
@@ -30,7 +31,7 @@ export const createProduct = async (req, res) => {
       });
     }
 
-    const product = new Product({
+    const productId = await Product.create({
       productCode: productCode.trim(),
       productName: productName.trim(),
       rate,
@@ -39,7 +40,7 @@ export const createProduct = async (req, res) => {
       crate
     });
 
-    await product.save();
+    const product = await Product.findById(productId);
 
     res.status(201).json({
       status: 201,
@@ -65,7 +66,7 @@ export const createProduct = async (req, res) => {
  */
 export const getProducts = async (req, res) => {
   try {
-    const products = await Product.find({}).sort({ createdAt: -1 });
+    const products = await Product.findAll();
 
     res.status(200).json({
       status: 200,
@@ -199,6 +200,70 @@ export const deleteProduct = async (req, res) => {
       status: 500,
       success: false,
       message: 'Internal server error while deleting product',
+      data: null
+    });
+  }
+};
+
+/**
+ * @desc    Get all products with prices for distributor
+ * @route   GET /api/products/distributor
+ * @access  Private (Distributor only)
+ */
+export const getProductsForDistributor = async (req, res) => {
+  try {
+    const distributorId = req.user._id;
+
+    // Get all products
+    const products = await Product.find({}).sort({ createdAt: -1 });
+
+    // Get custom prices for this distributor
+    const customPrices = await ProductPrice.find({ distributorId })
+      .select('productId price')
+      .lean();
+
+    // Create a map for quick lookup
+    const priceMap = new Map();
+    customPrices.forEach(cp => {
+      priceMap.set(cp.productId.toString(), cp.price);
+    });
+
+    // Build response with price logic
+    const productsWithPrices = products.map(product => {
+      const productId = product._id.toString();
+      const customPrice = priceMap.get(productId);
+      const isCustomPrice = customPrice !== undefined;
+
+      return {
+        _id: product._id,
+        productCode: product.productCode,
+        productName: product.productName,
+        defaultRate: product.rate,
+        price: isCustomPrice ? customPrice : product.rate,
+        isCustomPrice,
+        gst: product.gst,
+        unit: product.unit,
+        crate: product.crate,
+        createdAt: product.createdAt,
+        updatedAt: product.updatedAt
+      };
+    });
+
+    res.status(200).json({
+      status: 200,
+      success: true,
+      message: 'Products with prices retrieved successfully',
+      data: {
+        products: productsWithPrices,
+        count: productsWithPrices.length
+      }
+    });
+  } catch (error) {
+    console.error('Get products for distributor error:', error);
+    res.status(500).json({
+      status: 500,
+      success: false,
+      message: 'Internal server error while retrieving products',
       data: null
     });
   }
