@@ -1,7 +1,7 @@
 import app from './app.js';
 import User from './models/userModel.js';
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 
 /**
  * Seed admin user if no admin exists

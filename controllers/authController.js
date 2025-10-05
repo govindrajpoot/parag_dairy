@@ -3,9 +3,17 @@ import jwt from 'jsonwebtoken';
 
 export const signup = async (req, res) => {
   try {
+    console.log('Signup request body:', req.body);
+
     const userId = await User.create(req.body);
+    console.log('User created with ID:', userId);
+
     const user = await User.findById(userId);
+    console.log('User found:', user ? 'yes' : 'no');
+
     const token = user.generateAuthToken();
+    console.log('Token generated successfully');
+
     res.status(201).json({
       status: 201,
       success: true,
@@ -13,6 +21,9 @@ export const signup = async (req, res) => {
       data: { user: user.toSafeObject(), token }
     });
   } catch (error) {
+    console.error('Signup error:', error);
+    console.error('Error stack:', error.stack);
+
     res.status(400).json({
       status: 400,
       success: false,
