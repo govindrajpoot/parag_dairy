@@ -31,23 +31,7 @@ const limiter = rateLimit({
 // Middleware
 app.use(limiter); // Apply rate limiting
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-
-    const allowedOrigins = [
-      'http://localhost:3000',  // For local testing
-      'https://dairy.u2tech.in', // Production domain
-      'http://dairy.u2tech.in',  // Production domain (HTTP)
-      process.env.FRONTEND_URL
-    ].filter(Boolean);
-
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-
-    return callback(new Error('Not allowed by CORS'));
-  },
+  origin: true, // Allow all origins for testing
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));
@@ -55,21 +39,15 @@ app.use(express.urlencoded({ extended: true }));
 
 // Swagger configuration
 const swaggerOptions = {
-  definition: {
-    openapi: '3.0.0',
+  swaggerDefinition: {
+    openapi: "3.0.0",
     info: {
-      title: 'Param Dairy API',
-      version: '1.0.0',
-      description: 'User authentication and product management API with role-based access control',
+      title: "Param Dairy API",
+      version: "1.0.0",
     },
     servers: [
       {
-        url: 'http://localhost:5000',
-        description: 'Development server',
-      },
-      {
-        url: 'https://dairy.u2tech.in',
-        description: 'Production server',
+        url: process.env.FRONTEND_URL || "http://localhost:5000",
       },
     ],
     components: {
@@ -87,7 +65,7 @@ const swaggerOptions = {
       },
     ],
   },
-  apis: ['./routes/*.js'], // Path to the API docs
+  apis: ["./routes/*.js"],
 };
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);

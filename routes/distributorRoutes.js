@@ -205,7 +205,7 @@ router.get('/:id', authenticateToken, (req, res, next) => {
  * @access  Private (Admin or Distributor themselves)
  */
 router.put('/:id', authenticateToken, (req, res, next) => {
-  if (req.user.role === 'Admin' || req.user._id.toString() === req.params.id) {
+  if (req.user.role === 'Admin' || req.user.id.toString() === req.params.id) {
     return next();
   }
   return res.status(403).json({
@@ -217,12 +217,63 @@ router.put('/:id', authenticateToken, (req, res, next) => {
 }, updateDistributor);
 
 /**
+ * @swagger
+ * /api/distributors/{id}:
+ *   delete:
+ *     summary: Delete distributor by ID
+ *     tags: [Distributors]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Distributor ID
+ *     responses:
+ *       200:
+ *         description: Distributor deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     deletedDistributor:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           type: integer
+ *                         name:
+ *                           type: string
+ *                         email:
+ *                           type: string
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - insufficient permissions
+ *       404:
+ *         description: Distributor not found
+ *       500:
+ *         description: Server error
+ */
+
+/**
  * @route   DELETE /api/distributors/:id
  * @desc    Delete distributor by ID
  * @access  Private (Admin or Distributor themselves)
  */
 router.delete('/:id', authenticateToken, (req, res, next) => {
-  if (req.user.role === 'Admin' || req.user._id.toString() === req.params.id) {
+  if (req.user.role === 'Admin' || req.user.id.toString() === req.params.id) {
     return next();
   }
   return res.status(403).json({

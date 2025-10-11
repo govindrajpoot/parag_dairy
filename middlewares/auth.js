@@ -23,9 +23,11 @@ export const authenticateToken = async (req, res, next) => {
 
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret');
+    console.log('Token decoded:', decoded);
 
     // Get user from database
-    const user = await User.findById(decoded.id).select('-password');
+    const user = await User.findById(decoded.id);
+    console.log('User found in database:', user ? 'yes' : 'no', user ? user.id : 'N/A');
 
     if (!user || !user.isActive) {
       return res.status(401).json({

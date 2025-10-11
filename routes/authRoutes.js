@@ -10,6 +10,7 @@ const router = express.Router();
  *   post:
  *     summary: Register a new user
  *     tags: [Authentication]
+ *     security: []
  *     requestBody:
  *       required: true
  *       content:
@@ -104,6 +105,7 @@ router.post('/create-user', authenticateToken, canCreateUser, signup);
  *   post:
  *     summary: Authenticate user and get token
  *     tags: [Authentication]
+ *     security: []
  *     requestBody:
  *       required: true
  *       content:
@@ -173,6 +175,7 @@ router.get('/users', authenticateToken, authorizeRoles('Admin'), getAllUsers);
  *   post:
  *     summary: Reset user password
  *     tags: [Authentication]
+ *     security: []
  *     requestBody:
  *       required: true
  *       content:
