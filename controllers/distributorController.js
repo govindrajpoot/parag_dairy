@@ -39,7 +39,7 @@ export const getDistributors = async (req, res) => {
  */
 export const getDistributorById = async (req, res) => {
   try {
-    const distributor = await User.findOne({ _id: req.params.id, role: 'Distributor' }).select('-password');
+    const distributor = await User.findOne({ _id: req.params.id, role: 'Distributor' });
 
     if (!distributor) {
       return res.status(404).json({
@@ -54,7 +54,7 @@ export const getDistributorById = async (req, res) => {
       status: 200,
       success: true,
       message: 'Distributor retrieved successfully',
-      data: distributor
+      data: distributor.toSafeObject()
     });
   } catch (error) {
     console.error('Get distributor by ID error:', error);
@@ -83,8 +83,8 @@ export const updateDistributor = async (req, res) => {
     const distributor = await User.findOneAndUpdate(
       { _id: req.params.id, role: 'Distributor' },
       updateData,
-      { new: true, runValidators: true }
-    ).select('-password');
+      { new: true }
+    );
 
     if (!distributor) {
       return res.status(404).json({
@@ -99,7 +99,7 @@ export const updateDistributor = async (req, res) => {
       status: 200,
       success: true,
       message: 'Distributor updated successfully',
-      data: distributor
+      data: distributor.toSafeObject()
     });
   } catch (error) {
     console.error('Update distributor error:', error);

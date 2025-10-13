@@ -143,21 +143,25 @@ export const updateProduct = async (req, res) => {
       });
     }
 
-    // Update fields if provided
-    if (productCode) product.productCode = productCode.trim();
-    if (productName) product.productName = productName.trim();
-    if (rate != null) product.rate = rate;
-    if (gst != null) product.gst = gst;
-    if (unit) product.unit = unit.trim();
-    if (crate != null) product.crate = crate;
+    // Prepare update data
+    const updateData = {};
+    if (productCode) updateData.productCode = productCode.trim();
+    if (productName) updateData.productName = productName.trim();
+    if (rate != null) updateData.rate = rate;
+    if (gst != null) updateData.gst = gst;
+    if (unit) updateData.unit = unit.trim();
+    if (crate != null) updateData.crate = crate;
 
-    await product.save();
+    await Product.update(req.params.id, updateData);
+
+    // Fetch updated product
+    const updatedProduct = await Product.findById(req.params.id);
 
     res.status(200).json({
       status: 200,
       success: true,
       message: 'Product updated successfully',
-      data: product
+      data: updatedProduct
     });
   } catch (error) {
     console.error('Update product error:', error);
@@ -212,30 +216,28 @@ export const deleteProduct = async (req, res) => {
  */
 export const getProductsForDistributor = async (req, res) => {
   try {
-    const distributorId = req.user._id;
+    const distributorId = req.user.id;
 
     // Get all products
-    const products = await Product.find({}).sort({ createdAt: -1 });
+    const products = await Product.findAll();
 
     // Get custom prices for this distributor
-    const customPrices = await ProductPrice.find({ distributorId })
-      .select('productId price')
-      .lean();
+    const customPrices = await ProductPrice.findByDistributorId(distributorId);
 
     // Create a map for quick lookup
     const priceMap = new Map();
     customPrices.forEach(cp => {
-      priceMap.set(cp.productId.toString(), cp.price);
+      priceMap.set(cp.productId, cp.price);
     });
 
     // Build response with price logic
     const productsWithPrices = products.map(product => {
-      const productId = product._id.toString();
+      const productId = product.id;
       const customPrice = priceMap.get(productId);
       const isCustomPrice = customPrice !== undefined;
 
       return {
-        _id: product._id,
+        id: product.id,
         productCode: product.productCode,
         productName: product.productName,
         defaultRate: product.rate,

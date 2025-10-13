@@ -1,4 +1,5 @@
 -- Create database if not exists
+DROP DATABASE IF EXISTS dairy;
 CREATE DATABASE IF NOT EXISTS dairy;
 USE dairy;
 
@@ -51,6 +52,6 @@ CREATE TABLE IF NOT EXISTS productprices (
 -- Indexes for better performance
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_users_role ON users(role);
-CREATE INDEX idx_products_name ON products(name);
+CREATE INDEX idx_products_name ON products(productName);
 CREATE INDEX idx_productprices_product ON productprices(productId);
 CREATE INDEX idx_productprices_distributor ON productprices(distributorId);
