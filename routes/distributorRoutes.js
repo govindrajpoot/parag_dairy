@@ -1,10 +1,5 @@
 import express from 'express';
-import {
-  getDistributors,
-  getDistributorById,
-  updateDistributor,
-  deleteDistributor
-} from '../controllers/distributorController.js';
+import {getDistributors,getDistributorById,updateDistributor,deleteDistributor} from '../controllers/distributorController.js';
 import { auth } from '../middlewares/auth.js';
 import { USER_ROLES } from '../utils/constants.js';
 import { distributorUpdateValidation } from '../validators/distributorValidator.js';

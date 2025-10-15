@@ -1,11 +1,5 @@
 import express from 'express';
-import {
-  createProductPrice,
-  getProductPrices,
-  getProductPriceById,
-  updateProductPrice,
-  deleteProductPrice
-} from '../controllers/productPriceController.js';
+import {createProductPrice,getProductPrices,getProductPriceById,updateProductPrice,deleteProductPrice} from '../controllers/productPriceController.js';
 import { auth } from '../middlewares/auth.js';
 import { USER_ROLES } from '../utils/constants.js';
 import { createProductPriceValidation, updateProductPriceValidation } from '../validators/productPriceValidator.js';
