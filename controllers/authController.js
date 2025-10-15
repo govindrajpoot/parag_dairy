@@ -1,101 +1,45 @@
-import User from '../models/userModel.js';
-import jwt from 'jsonwebtoken';
+import * as authService from '../services/authService.js';
+import { sendSuccessResponse, sendErrorResponse } from '../utils/apiResponse.js';
+import { HTTP_STATUS_CODES } from '../utils/constants.js';
 
 export const signup = async (req, res) => {
   try {
-    console.log('Signup request body:', req.body);
-
-    const userId = await User.create(req.body);
-    console.log('User created with ID:', userId);
-
-    const user = await User.findById(userId);
-    console.log('User found:', user ? 'yes' : 'no');
-
-    const token = user.generateAuthToken();
-    console.log('Token generated successfully');
-
-    res.status(201).json({
-      status: 201,
-      success: true,
-      message: 'User registered successfully',
-      data: { user: user.toSafeObject(), token }
-    });
+    const { user, token } = await authService.signup(req.body);
+    sendSuccessResponse(res, HTTP_STATUS_CODES.CREATED, 'User registered successfully', { user, token });
   } catch (error) {
     console.error('Signup error:', error);
-    console.error('Error stack:', error.stack);
-
-    res.status(400).json({
-      status: 400,
-      success: false,
-      message: error.message,
-      data: null
-    });
+    sendErrorResponse(res, error.statusCode || HTTP_STATUS_CODES.BAD_REQUEST, error.message || 'Internal server error during signup');
   }
 };
 
 export const signin = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findByEmail(email);
-    if (!user) {
-      return res.status(401).json({
-        status: 401,
-        success: false,
-        message: 'Invalid email or password',
-        data: null
-      });
-    }
-    const isMatch = await user.comparePassword(password);
-    if (!isMatch) {
-      return res.status(401).json({
-        status: 401,
-        success: false,
-        message: 'Invalid email or password',
-        data: null
-      });
-    }
-    const token = user.generateAuthToken();
-    res.status(200).json({
-      status: 200,
-      success: true,
-      message: 'Signed in successfully',
-      data: { user: user.toSafeObject(), token }
-    });
+    const { user, token } = await authService.signin(email, password);
+    sendSuccessResponse(res, HTTP_STATUS_CODES.OK, 'Signed in successfully', { user, token });
   } catch (error) {
-    res.status(500).json({
-      status: 500,
-      success: false,
-      message: error.message,
-      data: null
-    });
+    console.error('Signin error:', error);
+    sendErrorResponse(res, error.statusCode || HTTP_STATUS_CODES.UNAUTHORIZED, error.message || 'Internal server error during signin');
   }
 };
 
 export const getAllUsers = async (req, res) => {
   try {
-    const users = await User.findAll();
-    res.status(200).json({
-      status: 200,
-      success: true,
-      message: 'Users fetched successfully',
-      data: users.map(user => user.toSafeObject())
-    });
+    const users = await authService.getAllUsers();
+    sendSuccessResponse(res, HTTP_STATUS_CODES.OK, 'Users fetched successfully', users);
   } catch (error) {
-    res.status(500).json({
-      status: 500,
-      success: false,
-      message: error.message,
-      data: null
-    });
+    console.error('Get all users error:', error);
+    sendErrorResponse(res, HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, 'Internal server error while fetching users');
   }
 };
 
 export const resetPassword = async (req, res) => {
-  // Implement reset password logic as per your requirements
-  res.status(501).json({
-    status: 501,
-    success: false,
-    message: 'Reset password not implemented',
-    data: null
-  });
+  try {
+    const { email } = req.body;
+    await authService.resetPassword(email);
+    sendSuccessResponse(res, HTTP_STATUS_CODES.OK, 'Password reset email sent (if user exists)', null);
+  } catch (error) {
+    console.error('Reset password error:', error);
+    sendErrorResponse(res, error.statusCode || HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, error.message || 'Internal server error during password reset');
+  }
 };

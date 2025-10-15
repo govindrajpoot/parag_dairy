@@ -7,208 +7,23 @@ import {
   deleteProduct,
   getProductsForDistributor
 } from '../controllers/productController.js';
-import { authenticateToken, authorizeRoles } from '../middlewares/auth.js';
+import { auth } from '../middlewares/auth.js';
+import { USER_ROLES } from '../utils/constants.js';
+import { productValidation, productUpdateValidation } from '../validators/productValidator.js';
+import { handleValidationErrors } from '../middlewares/validationHandler.js';
 
 const router = express.Router();
 
-/**
- * @swagger
- * /api/products:
- *   post:
- *     summary: Create a new product
- *     tags: [Products]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - productCode
- *               - productName
- *               - rate
- *               - gst
- *               - unit
- *               - crate
- *             properties:
- *               productCode:
- *                 type: string
- *                 description: Unique product code
- *               productName:
- *                 type: string
- *                 description: Product name
- *               rate:
- *                 type: number
- *                 description: Product rate
- *               gst:
- *                 type: number
- *                 description: GST percentage
- *               unit:
- *                 type: string
- *                 description: Unit of measurement
- *               crate:
- *                 type: integer
- *                 description: Items per crate
- *     responses:
- *       201:
- *         description: Product created successfully
- *       400:
- *         description: Validation error
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden
- *       500:
- *         description: Server error
- */
-router.post('/', authenticateToken, authorizeRoles('Admin'), createProduct);
+router.post('/', ...auth(USER_ROLES.ADMIN), productValidation, handleValidationErrors, createProduct);
 
-/**
- * @swagger
- * /api/products:
- *   get:
- *     summary: Get all products
- *     tags: [Products]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Products retrieved successfully
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden
- *       500:
- *         description: Server error
- */
-router.get('/', authenticateToken, authorizeRoles('Admin'), getProducts);
+router.get('/', ...auth(USER_ROLES.ADMIN), getProducts);
 
-/**
- * @swagger
- * /api/products/{id}:
- *   get:
- *     summary: Get product by ID
- *     tags: [Products]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Product ID
- *     responses:
- *       200:
- *         description: Product retrieved successfully
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden
- *       404:
- *         description: Product not found
- *       500:
- *         description: Server error
- */
-router.get('/:id', authenticateToken, authorizeRoles('Admin'), getProductById);
+router.get('/distributor', ...auth(USER_ROLES.ADMIN, USER_ROLES.DISTRIBUTOR), getProductsForDistributor);
 
-/**
- * @swagger
- * /api/products/{id}:
- *   put:
- *     summary: Update product by ID
- *     tags: [Products]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Product ID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               productCode:
- *                 type: string
- *               productName:
- *                 type: string
- *               rate:
- *                 type: number
- *               gst:
- *                 type: number
- *               unit:
- *                 type: string
- *               crate:
- *                 type: integer
- *     responses:
- *       200:
- *         description: Product updated successfully
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden
- *       404:
- *         description: Product not found
- *       500:
- *         description: Server error
- */
-router.put('/:id', authenticateToken, authorizeRoles('Admin'), updateProduct);
+router.get('/:id', ...auth(USER_ROLES.ADMIN), getProductById);
 
-/**
- * @swagger
- * /api/products/{id}:
- *   delete:
- *     summary: Delete product by ID
- *     tags: [Products]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Product ID
- *     responses:
- *       200:
- *         description: Product deleted successfully
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden
- *       404:
- *         description: Product not found
- *       500:
- *         description: Server error
- */
-router.delete('/:id', authenticateToken, authorizeRoles('Admin'), deleteProduct);
+router.put('/:id', ...auth(USER_ROLES.ADMIN), productUpdateValidation, handleValidationErrors, updateProduct);
 
-/**
- * @swagger
- * /api/products/distributor:
- *   get:
- *     summary: Get all products with prices for distributor
- *     tags: [Products]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Products with prices retrieved successfully
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden
- *       500:
- *         description: Server error
- */
-router.get('/distributor', authenticateToken, authorizeRoles('Distributor'), getProductsForDistributor);
+router.delete('/:id', ...auth(USER_ROLES.ADMIN), deleteProduct);
 
 export default router;

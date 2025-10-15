@@ -1,4 +1,6 @@
-import User from '../models/userModel.js';
+import * as distributorService from '../services/distributorService.js';
+import { sendSuccessResponse, sendErrorResponse } from '../utils/apiResponse.js';
+import { HTTP_STATUS_CODES } from '../utils/constants.js';
 
 /**
  * @desc    Get all distributors
@@ -7,28 +9,14 @@ import User from '../models/userModel.js';
  */
 export const getDistributors = async (req, res) => {
   try {
-    const distributors = await User.findDistributors();
-
-    // Remove password from response
-    const safeDistributors = distributors.map(distributor => distributor.toSafeObject());
-
-    res.status(200).json({
-      status: 200,
-      success: true,
-      message: 'Distributors retrieved successfully',
-      data: {
-        distributors: safeDistributors,
-        count: safeDistributors.length
-      }
+    const distributors = await distributorService.getDistributors();
+    sendSuccessResponse(res, HTTP_STATUS_CODES.OK, 'Distributors retrieved successfully', {
+      distributors,
+      count: distributors.length
     });
   } catch (error) {
     console.error('Get distributors error:', error);
-    res.status(500).json({
-      status: 500,
-      success: false,
-      message: 'Internal server error while retrieving distributors',
-      data: null
-    });
+    sendErrorResponse(res, error.statusCode || HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, error.message || 'Internal server error while retrieving distributors');
   }
 };
 
@@ -39,31 +27,14 @@ export const getDistributors = async (req, res) => {
  */
 export const getDistributorById = async (req, res) => {
   try {
-    const distributor = await User.findOne({ _id: req.params.id, role: 'Distributor' });
-
+    const distributor = await distributorService.getDistributorById(req.params.id);
     if (!distributor) {
-      return res.status(404).json({
-        status: 404,
-        success: false,
-        message: 'Distributor not found',
-        data: null
-      });
+      return sendErrorResponse(res, HTTP_STATUS_CODES.NOT_FOUND, 'Distributor not found');
     }
-
-    res.status(200).json({
-      status: 200,
-      success: true,
-      message: 'Distributor retrieved successfully',
-      data: distributor.toSafeObject()
-    });
+    sendSuccessResponse(res, HTTP_STATUS_CODES.OK, 'Distributor retrieved successfully', distributor);
   } catch (error) {
     console.error('Get distributor by ID error:', error);
-    res.status(500).json({
-      status: 500,
-      success: false,
-      message: 'Internal server error while retrieving distributor',
-      data: null
-    });
+    sendErrorResponse(res, error.statusCode || HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, error.message || 'Internal server error while retrieving distributor');
   }
 };
 
@@ -74,41 +45,14 @@ export const getDistributorById = async (req, res) => {
  */
 export const updateDistributor = async (req, res) => {
   try {
-    const updateData = { ...req.body };
-
-    // Prevent role change or password update here (password update via reset-password)
-    delete updateData.role;
-    delete updateData.password;
-
-    const distributor = await User.findOneAndUpdate(
-      { _id: req.params.id, role: 'Distributor' },
-      updateData,
-      { new: true }
-    );
-
-    if (!distributor) {
-      return res.status(404).json({
-        status: 404,
-        success: false,
-        message: 'Distributor not found',
-        data: null
-      });
+    const updatedDistributor = await distributorService.updateDistributor(req.params.id, req.body);
+    if (!updatedDistributor) {
+      return sendErrorResponse(res, HTTP_STATUS_CODES.NOT_FOUND, 'Distributor not found');
     }
-
-    res.status(200).json({
-      status: 200,
-      success: true,
-      message: 'Distributor updated successfully',
-      data: distributor.toSafeObject()
-    });
+    sendSuccessResponse(res, HTTP_STATUS_CODES.OK, 'Distributor updated successfully', updatedDistributor);
   } catch (error) {
     console.error('Update distributor error:', error);
-    res.status(500).json({
-      status: 500,
-      success: false,
-      message: 'Internal server error while updating distributor',
-      data: null
-    });
+    sendErrorResponse(res, error.statusCode || HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, error.message || 'Internal server error while updating distributor');
   }
 };
 
@@ -119,30 +63,13 @@ export const updateDistributor = async (req, res) => {
  */
 export const deleteDistributor = async (req, res) => {
   try {
-    const distributor = await User.findOneAndDelete({ _id: req.params.id, role: 'Distributor' });
-
-    if (!distributor) {
-      return res.status(404).json({
-        status: 404,
-        success: false,
-        message: 'Distributor not found',
-        data: null
-      });
+    const deletedDistributor = await distributorService.deleteDistributor(req.params.id);
+    if (!deletedDistributor) {
+      return sendErrorResponse(res, HTTP_STATUS_CODES.NOT_FOUND, 'Distributor not found');
     }
-
-    res.status(200).json({
-      status: 200,
-      success: true,
-      message: 'Distributor deleted successfully',
-      data: null
-    });
+    sendSuccessResponse(res, HTTP_STATUS_CODES.OK, 'Distributor deleted successfully', null);
   } catch (error) {
     console.error('Delete distributor error:', error);
-    res.status(500).json({
-      status: 500,
-      success: false,
-      message: 'Internal server error while deleting distributor',
-      data: null
-    });
+    sendErrorResponse(res, error.statusCode || HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, error.message || 'Internal server error while deleting distributor');
   }
 };

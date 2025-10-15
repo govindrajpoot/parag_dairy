@@ -9,3 +9,12 @@ export const productValidation = [
   body('unit').notEmpty().withMessage('Unit is required').trim(),
   body('crate').isInt({ gt: 0 }).withMessage('Crate must be a positive integer'),
 ];
+
+export const productUpdateValidation = [
+  body('productCode').optional().notEmpty().withMessage('Product Code cannot be empty').trim(),
+  body('productName').optional().notEmpty().withMessage('Product Name cannot be empty').trim(),
+  body('rate').optional().isFloat({ gt: 0 }).withMessage('Rate must be a positive number'),
+  body('gst').optional().isFloat({ min: 0, max: 100 }).withMessage('GST must be between 0 and 100'),
+  body('unit').optional().notEmpty().withMessage('Unit cannot be empty').trim(),
+  body('crate').optional().isInt({ gt: 0 }).withMessage('Crate must be a positive integer'),
+];

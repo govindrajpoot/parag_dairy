@@ -6,171 +6,21 @@ import {
   updateProductPrice,
   deleteProductPrice
 } from '../controllers/productPriceController.js';
-import { authenticateToken, authorizeRoles } from '../middlewares/auth.js';
+import { auth } from '../middlewares/auth.js';
+import { USER_ROLES } from '../utils/constants.js';
+import { createProductPriceValidation, updateProductPriceValidation } from '../validators/productPriceValidator.js';
+import { handleValidationErrors } from '../middlewares/validationHandler.js';
 
 const router = express.Router();
 
-/**
- * @swagger
- * /api/product-prices:
- *   post:
- *     summary: Create a new product price for distributor
- *     tags: [Product Prices]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - distributorId
- *               - productId
- *               - price
- *             properties:
- *               distributorId:
- *                 type: string
- *                 description: Distributor ID
- *               productId:
- *                 type: string
- *                 description: Product ID
- *               price:
- *                 type: number
- *                 description: Custom price for the distributor
- *     responses:
- *       201:
- *         description: Product price created successfully
- *       400:
- *         description: Validation error
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden
- *       404:
- *         description: Distributor or product not found
- *       500:
- *         description: Server error
- */
-router.post('/', authenticateToken, authorizeRoles('Admin'), createProductPrice);
+router.post('/', ...auth(USER_ROLES.ADMIN), createProductPriceValidation, handleValidationErrors, createProductPrice);
 
-/**
- * @swagger
- * /api/product-prices:
- *   get:
- *     summary: Get all product prices with comprehensive product list per distributor
- *     tags: [Product Prices]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Product prices retrieved successfully
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden
- *       500:
- *         description: Server error
- */
-router.get('/', authenticateToken, authorizeRoles('Admin'), getProductPrices);
+router.get('/', ...auth(USER_ROLES.ADMIN), getProductPrices);
 
-/**
- * @swagger
- * /api/product-prices/{id}:
- *   get:
- *     summary: Get product price by ID
- *     tags: [Product Prices]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Product price ID
- *     responses:
- *       200:
- *         description: Product price retrieved successfully
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden
- *       404:
- *         description: Product price not found
- *       500:
- *         description: Server error
- */
-router.get('/:id', authenticateToken, authorizeRoles('Admin'), getProductPriceById);
+router.get('/:id', ...auth(USER_ROLES.ADMIN), getProductPriceById);
 
-/**
- * @swagger
- * /api/product-prices/{id}:
- *   put:
- *     summary: Update product price by ID
- *     tags: [Product Prices]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Product price ID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - price
- *             properties:
- *               price:
- *                 type: number
- *                 description: New price for the distributor
- *     responses:
- *       200:
- *         description: Product price updated successfully
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden
- *       404:
- *         description: Product price not found
- *       500:
- *         description: Server error
- */
-router.put('/:id', authenticateToken, authorizeRoles('Admin'), updateProductPrice);
+router.put('/:id', ...auth(USER_ROLES.ADMIN), updateProductPriceValidation, handleValidationErrors, updateProductPrice);
 
-/**
- * @swagger
- * /api/product-prices/{id}:
- *   delete:
- *     summary: Delete product price by ID
- *     tags: [Product Prices]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Product price ID
- *     responses:
- *       200:
- *         description: Product price deleted successfully
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden
- *       404:
- *         description: Product price not found
- *       500:
- *         description: Server error
- */
-router.delete('/:id', authenticateToken, authorizeRoles('Admin'), deleteProductPrice);
+router.delete('/:id', ...auth(USER_ROLES.ADMIN), deleteProductPrice);
 
 export default router;

@@ -18,3 +18,7 @@ export const resetPasswordValidation = [
   body('email').isEmail().withMessage('Invalid email address').normalizeEmail(),
   body('newPassword').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
 ];
+
+export const forgotPasswordValidation = [
+  body('email').isEmail().withMessage('Invalid email address').normalizeEmail(),
+];
