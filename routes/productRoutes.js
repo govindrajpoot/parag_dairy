@@ -9,11 +9,11 @@ const router = express.Router();
 
 router.post('/', ...auth(USER_ROLES.ADMIN), productValidation, handleValidationErrors, createProduct);
 
-router.get('/', ...auth(USER_ROLES.ADMIN), getProducts);
+router.get('/', ...auth(USER_ROLES.ADMIN, USER_ROLES.DISTRIBUTOR), getProducts);
 
 router.get('/distributor', ...auth(USER_ROLES.ADMIN, USER_ROLES.DISTRIBUTOR), getProductsForDistributor);
 
-router.get('/:id', ...auth(USER_ROLES.ADMIN), getProductById);
+router.get('/:id', ...auth(USER_ROLES.ADMIN, USER_ROLES.DISTRIBUTOR), getProductById);
 
 router.put('/:id', ...auth(USER_ROLES.ADMIN), productUpdateValidation, handleValidationErrors, updateProduct);
 

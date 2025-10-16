@@ -4,9 +4,9 @@ import User from '../models/userModel.js';
 import { USER_ROLES } from '../utils/constants.js';
 
 /**
- * Create a new product price for a distributor.
+ * Create or update a product price for a distributor (add-or-update logic).
  * @param {object} productPriceData - The product price data.
- * @returns {Promise<object>} The created product price.
+ * @returns {Promise<object>} The created or updated product price.
  */
 export const createProductPrice = async (productPriceData) => {
   const { distributorId, productId, price } = productPriceData;
@@ -30,18 +30,18 @@ export const createProductPrice = async (productPriceData) => {
   // Check if price already exists for this distributor-product
   const existingPrice = await ProductPrice.findByDistributorAndProduct(distributorId, productId);
   if (existingPrice) {
-    const error = new Error('Price already set for this distributor and product');
-    error.statusCode = 400;
-    throw error;
+    // Update existing price
+    await ProductPrice.update(existingPrice.id, { price });
+    return ProductPrice.findById(existingPrice.id);
+  } else {
+    // Create new price
+    const productPriceId = await ProductPrice.create({
+      distributorId,
+      productId,
+      price
+    });
+    return ProductPrice.findById(productPriceId);
   }
-
-  const productPriceId = await ProductPrice.create({
-    distributorId,
-    productId,
-    price
-  });
-
-  return ProductPrice.findById(productPriceId);
 };
 
 /**

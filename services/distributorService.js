@@ -1,4 +1,5 @@
 import User from '../models/userModel.js';
+import Demand from '../models/DemandModel.js';
 import { USER_ROLES } from '../utils/constants.js';
 
 /**
@@ -57,4 +58,31 @@ export const deleteDistributor = async (id) => {
     return null;
   }
   return distributor.toSafeObject();
+};
+
+/**
+ * Create demand for distributor (product-wise).
+ * @param {string} distributorId - The ID of the distributor.
+ * @param {object} demandData - { date?: Date, rno: string, products: [{productId: number, qty: number}] }
+ * @returns {Promise<object>} Result with inserted IDs.
+ */
+export const createDemand = async (distributorId, demandData) => {
+  const { date, rno, products } = demandData;
+  if (!rno || !products || !Array.isArray(products) || products.length === 0) {
+    throw new Error('Valid RNO and at least one product required');
+  }
+
+  // Verify distributor exists and is a distributor
+  const distributor = await User.findById(distributorId);
+  if (!distributor || distributor.role !== USER_ROLES.DISTRIBUTOR) {
+    throw new Error('Invalid distributor');
+  }
+
+  const insertIds = await Demand.createDemand(distributorId, date, rno, products);
+  return {
+    success: true,
+    message: 'Demand created successfully',
+    insertedCount: insertIds.length,
+    ids: insertIds
+  };
 };

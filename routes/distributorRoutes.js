@@ -1,8 +1,8 @@
 import express from 'express';
-import {getDistributors,getDistributorById,updateDistributor,deleteDistributor} from '../controllers/distributorController.js';
+import {getDistributors,getDistributorById,updateDistributor,deleteDistributor, createDemand} from '../controllers/distributorController.js';
 import { auth } from '../middlewares/auth.js';
 import { USER_ROLES } from '../utils/constants.js';
-import { distributorUpdateValidation } from '../validators/distributorValidator.js';
+import { distributorUpdateValidation, createDemandValidation } from '../validators/distributorValidator.js';
 import { handleValidationErrors } from '../middlewares/validationHandler.js';
 
 const router = express.Router();
@@ -34,5 +34,12 @@ router.put('/:id', ...auth(USER_ROLES.ADMIN), distributorUpdateValidation, handl
  * @access  Private (Admin only)
  */
 router.delete('/:id', ...auth(USER_ROLES.ADMIN), deleteDistributor);
+
+/**
+ * @route   POST /api/distributors/demands
+ * @desc    Create demand for distributor (product-wise)
+ * @access  Private (Distributor only)
+ */
+router.post('/demands', ...auth(USER_ROLES.DISTRIBUTOR), createDemandValidation, handleValidationErrors, createDemand);
 
 export default router;

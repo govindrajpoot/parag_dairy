@@ -9,9 +9,9 @@ const router = express.Router();
 
 router.post('/', ...auth(USER_ROLES.ADMIN), createProductPriceValidation, handleValidationErrors, createProductPrice);
 
-router.get('/', ...auth(USER_ROLES.ADMIN), getProductPrices);
+router.get('/', ...auth(USER_ROLES.ADMIN, USER_ROLES.DISTRIBUTOR), getProductPrices);
 
-router.get('/:id', ...auth(USER_ROLES.ADMIN), getProductPriceById);
+router.get('/:id', ...auth(USER_ROLES.ADMIN, USER_ROLES.DISTRIBUTOR), getProductPriceById);
 
 router.put('/:id', ...auth(USER_ROLES.ADMIN), updateProductPriceValidation, handleValidationErrors, updateProductPrice);
 

@@ -39,7 +39,7 @@ class User {
       userData.openingBalance || 0,
       userData.email,
       hashedPassword,
-      userData.role || 'Sub-Admin',
+      userData.role || 'Distributor',
       userData.createdBy || null,
       userData.isActive !== undefined ? userData.isActive : true
     ];

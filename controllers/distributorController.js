@@ -73,3 +73,21 @@ export const deleteDistributor = async (req, res) => {
     sendErrorResponse(res, error.statusCode || HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, error.message || 'Internal server error while deleting distributor');
   }
 };
+
+/**
+ * @desc    Create demand for distributor (product-wise)
+ * @route   POST /api/distributors/demands
+ * @access  Private (Distributor only)
+ */
+export const createDemand = async (req, res) => {
+  try {
+    const result = await distributorService.createDemand(req.user.id, req.body);
+    sendSuccessResponse(res, HTTP_STATUS_CODES.CREATED, result.message, {
+      insertedCount: result.insertedCount,
+      ids: result.ids
+    });
+  } catch (error) {
+    console.error('Create demand error:', error);
+    sendErrorResponse(res, HTTP_STATUS_CODES.BAD_REQUEST, error.message || 'Failed to create demand');
+  }
+};
