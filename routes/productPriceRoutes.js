@@ -7,6 +7,7 @@ import { handleValidationErrors } from '../middlewares/validationHandler.js';
 
 const router = express.Router();
 
+//qwewewqwe
 router.post('/', ...auth(USER_ROLES.ADMIN), createProductPriceValidation, handleValidationErrors, createProductPrice);
 
 router.get('/', ...auth(USER_ROLES.ADMIN, USER_ROLES.DISTRIBUTOR), getProductPrices);
